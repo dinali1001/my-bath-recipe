@@ -1,0 +1,91 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Рецепт Расслабляющей Ванны</title>
+  <style>
+    body { font-family: Gaoel Sans, sans-serif; margin: 0; padding: 20px; background-color: #f0f0f0; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { color: #565552; text-align: center; }
+    h2 { color: #333; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin: 10px 0; }
+    .tips { background: #cfc5ab; padding: 10px; border-left: 4px solid #807c6f; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Рецепт Расслабляющей Домашней Ванны с Солью и Маслом Лаванды</h1>
+    
+    <h2>Ингредиенты:</h2>
+    <ul>
+      <li>1 стакан (около 200–250 г) морской или английской (эпсомской) соли</li>
+      <li>5–10 капель эфирного масла лаванды</li>
+      <li>1–2 ст. л. базового масла (например, миндального, кокосового или оливкового, по желанию)</li>
+      <li>1/4 стакана сухого молока или соды (для смягчения воды, по желанию)</li>
+      <li>Сушёные цветы лаванды (по желанию, для эстетики)</li>
+    </ul>
+
+    <h2>Инструкция:</h2>
+    <ul>
+      <li>В миске смешайте соль с базовым маслом (если используете), чтобы соль впитала масло.</li>
+      <li>Добавьте эфирное масло лаванды, тщательно перемешайте.</li>
+      <li>Если вы используете сухое молоко или соду, добавьте их в смесь и снова перемешайте.</li>
+      <li>Наполните ванну тёплой водой (36–38 °C, комфортной для тела температуры).</li>
+      <li>Всыпьте смесь в воду, перемешайте, чтобы соль растворилась.</li>
+      <li>Добавьте сушёные цветки лаванды для аромата и красоты (по желанию).</li>
+      <li>Принимайте ванну 15–20 минут, расслабьтесь и дышите глубоко.</li>
+    </ul>
+
+    <h2>Советы:</h2>
+    <div class="tips">
+      <ul>
+        <li>Перед использованием проверьте, нет ли у вас аллергии на лаванду.</li>
+        <li>Для усиления эффекта включите спокойную музыку и приглушите свет.</li>
+        <li>После ванны увлажните кожу кремом или маслом.</li>
+        <li>Наслаждайтесь отдыхом! 🛁</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
